@@ -11,13 +11,13 @@ console.log('Starting redux example');
 //   console.log('New action', action);
 // };
 
-var stateDefault = {
-  name: 'Anonymous',
-  hobbies: [],
-  movies: []
-};
-var nextHobbyId = 1;
-var nextMovieId = 1;
+// var stateDefault = {
+//   name: 'Anonymous',
+//   hobbies: [],
+//   movies: []
+// };
+// var nextHobbyId = 1;
+// var nextMovieId = 1;
 
 // // ES6 way of assigning default values
 // var oldReducer = (state = stateDefault, action) => {
@@ -70,7 +70,10 @@ var nextMovieId = 1;
 //   }
 // };
 
-// NAME REDUCER
+
+
+// NAME REDUCER and ACTION GENERATORS
+// ***************************************
 var nameReducer = (state = 'Anonymous', action) => {
   switch (action.type) {
     case 'CHANGE_NAME':
@@ -79,7 +82,18 @@ var nameReducer = (state = 'Anonymous', action) => {
       return state;
   }
 };
-// HOBBIES REDUCER
+// ACTION GENERATOR
+var changeName = (name) => {
+  return {
+    type: 'CHANGE_NAME',
+    name // is identical to name: name
+  }
+};
+
+
+// HOBBIES REDUCER and ACTION GENERATORS
+// ***************************************
+var nextHobbyId = 1;
 var hobbiesReducer = (state = [], action) => {
   switch (action.type) {
     case 'ADD_HOBBY':
@@ -96,7 +110,24 @@ var hobbiesReducer = (state = [], action) => {
       return state;
   }
 };
-// MOVIES REDUCER
+// ACTION GENERATOR
+var addHobby = (hobby) => {
+  return {
+    type: 'ADD_HOBBY',
+    hobby // is identical to hobby: hobby
+  }
+};
+// ACTION GENERATOR
+var removeHobby = (id) => {
+  return {
+    type: 'REMOVE_HOBBY',
+    id
+  }
+};
+
+// MOVIES REDUCER and ACTION GENERATORS
+// ***************************************
+var nextMovieId = 1;
 var moviesReducer = (state = [], action) => {
   switch (action.type) {
     case 'ADD_MOVIE':
@@ -109,12 +140,28 @@ var moviesReducer = (state = [], action) => {
         }
       ]
     case 'REMOVE_MOVIE':
-      return state.filter( (movie) => movie.id !== action.id);
+      return state.filter( (movie) => movie.id !== action.id)
     default:
       return state;
   }
 };
+// ACTION GENERATOR
+var addMovie = (movieName, movieGenre) => {
+  return {
+    type: 'ADD_MOVIE',
+    movieName,
+    movieGenre
+  }
+};
+// ACTION GENERATOR
+var removeMovie = (id) => {
+  return {
+    type: 'REMOVE_MOVIE',
+    id
+  }
+};
 
+// COMBINE REDUCERS
 var reducer = redux.combineReducers({
   // the name state will be managed by the name reducer
   name: nameReducer,
@@ -171,6 +218,9 @@ store.dispatch({
 // UNSUBSCRIBE
 // unsubscribe();
 
+// change name using action generator
+store.dispatch(changeName('Carly'));
+
 store.dispatch({
   type: 'ADD_MOVIE',
   movieName: 'Inception',
@@ -188,9 +238,16 @@ store.dispatch({
   id: 1
 });
 
-// store.dispatch({
-//   type: 'CHANGE_NAME',
-//   name: 'Bambi'
-// });
+store.dispatch({
+  type: 'CHANGE_NAME',
+  name: 'Bambi'
+});
+
+// change name using action generator
+store.dispatch(changeName('Dan'));
+store.dispatch(addHobby('streaking'));
+store.dispatch(removeHobby(1));
+store.dispatch(addMovie('42', 'biopic'));
+store.dispatch(removeMovie(2));
 // check that action changed the name
 // console.log('Name should be Brian', store.getState());
