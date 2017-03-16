@@ -11,8 +11,16 @@ console.log('Starting redux example');
 //   console.log('New action', action);
 // };
 
+var stateDefault = {
+  name: 'Anonymous',
+  hobbies: [],
+  movies: []
+};
+var nextHobbyId = 1;
+var nextMovieId = 1;
+
 // ES6 way of assigning default values
-var reducer = (state = {name: 'Anonymous'}, action) => {
+var reducer = (state = stateDefault, action) => {
   // console.log('New action', action);
 
   // HANDLE ACTION
@@ -22,6 +30,41 @@ var reducer = (state = {name: 'Anonymous'}, action) => {
         ...state,
         name: action.name
       };
+    case 'ADD_HOBBY':
+      return {
+        ...state,
+        hobbies: [
+          ...state.hobbies,
+          {
+            id: nextHobbyId++,
+            hobby: action.hobby
+          }
+        ]
+      }
+    case 'REMOVE_HOBBY':
+      return {
+        ...state,
+          // return true for every hobby that does not match the id passed
+        hobbies: state.hobbies.filter( (hobby) => hobby.id !== action.id)
+      }
+    case 'ADD_MOVIE':
+      return {
+        ...state,
+        movies: [
+          ...state.movies,
+          {
+            id: nextMovieId++,
+            movieName: action.movieName,
+            movieGenre: action.movieGenre
+          }
+        ]
+      }
+    case 'REMOVE_MOVIE':
+      return {
+        ...state,
+          // return true for every hobby that does not match the id passed
+        movies: state.movies.filter( (movie) => movie.id !== action.id)
+      }
     default:
       return state;
   }
@@ -39,6 +82,8 @@ var unsubscribe = store.subscribe(() => { // this saves unsubscribe method
 
   console.log('Name is ', state.name);
   document.getElementById('app').innerHTML = state.name;
+
+  console.log('New state', store.getState());
 });
 
 var currentState = store.getState(); // return state object
@@ -51,14 +96,49 @@ var action = {
 };
 
 // DISPATCH ACTION
-store.dispatch(action);
+store.dispatch({
+  type: 'ADD_HOBBY',
+  hobby: 'Running'
+});
+// DISPATCH ACTION
+store.dispatch({
+  type: 'ADD_HOBBY',
+  hobby: 'Walking'
+});
+// DISPATCH ACTION
+store.dispatch({
+  type: 'ADD_HOBBY',
+  hobby: 'Stretching'
+});
+// DISPATCH ACTION
+store.dispatch({
+  type: 'REMOVE_HOBBY',
+  id: 2
+});
 
 // UNSUBSCRIBE
 // unsubscribe();
 
 store.dispatch({
-  type: 'CHANGE_NAME',
-  name: 'Bambi'
+  type: 'ADD_MOVIE',
+  movieName: 'Inception',
+  movieGenre: 'Drama'
 });
+
+store.dispatch({
+  type: 'ADD_MOVIE',
+  movieName: 'Shawshank Redemption',
+  movieGenre: 'Drama'
+});
+
+store.dispatch({
+  type: 'REMOVE_MOVIE',
+  id: 1
+});
+
+// store.dispatch({
+//   type: 'CHANGE_NAME',
+//   name: 'Bambi'
+// });
 // check that action changed the name
 // console.log('Name should be Brian', store.getState());
