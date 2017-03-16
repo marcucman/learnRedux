@@ -19,56 +19,108 @@ var stateDefault = {
 var nextHobbyId = 1;
 var nextMovieId = 1;
 
-// ES6 way of assigning default values
-var reducer = (state = stateDefault, action) => {
-  // console.log('New action', action);
+// // ES6 way of assigning default values
+// var oldReducer = (state = stateDefault, action) => {
+//   // console.log('New action', action);
+//
+//   // HANDLE ACTION
+//   switch(action.type) {
+//     case 'CHANGE_NAME': // generate new state with name in action used to replace old name
+//       return {
+//         ...state,
+//         name: action.name
+//       };
+//     case 'ADD_HOBBY':
+//       return {
+//         ...state,
+//         hobbies: [
+//           ...state.hobbies,
+//           {
+//             id: nextHobbyId++,
+//             hobby: action.hobby
+//           }
+//         ]
+//       }
+//     case 'REMOVE_HOBBY':
+//       return {
+//         ...state,
+//           // return true for every hobby that does not match the id passed
+//         hobbies: state.hobbies.filter( (hobby) => hobby.id !== action.id)
+//       }
+//     case 'ADD_MOVIE':
+//       return {
+//         ...state,
+//         movies: [
+//           ...state.movies,
+//           {
+//             id: nextMovieId++,
+//             movieName: action.movieName,
+//             movieGenre: action.movieGenre
+//           }
+//         ]
+//       }
+//     case 'REMOVE_MOVIE':
+//       return {
+//         ...state,
+//           // return true for every hobby that does not match the id passed
+//         movies: state.movies.filter( (movie) => movie.id !== action.id)
+//       }
+//     default:
+//       return state;
+//   }
+// };
 
-  // HANDLE ACTION
-  switch(action.type) {
-    case 'CHANGE_NAME': // generate new state with name in action used to replace old name
-      return {
-        ...state,
-        name: action.name
-      };
-    case 'ADD_HOBBY':
-      return {
-        ...state,
-        hobbies: [
-          ...state.hobbies,
-          {
-            id: nextHobbyId++,
-            hobby: action.hobby
-          }
-        ]
-      }
-    case 'REMOVE_HOBBY':
-      return {
-        ...state,
-          // return true for every hobby that does not match the id passed
-        hobbies: state.hobbies.filter( (hobby) => hobby.id !== action.id)
-      }
-    case 'ADD_MOVIE':
-      return {
-        ...state,
-        movies: [
-          ...state.movies,
-          {
-            id: nextMovieId++,
-            movieName: action.movieName,
-            movieGenre: action.movieGenre
-          }
-        ]
-      }
-    case 'REMOVE_MOVIE':
-      return {
-        ...state,
-          // return true for every hobby that does not match the id passed
-        movies: state.movies.filter( (movie) => movie.id !== action.id)
-      }
+// NAME REDUCER
+var nameReducer = (state = 'Anonymous', action) => {
+  switch (action.type) {
+    case 'CHANGE_NAME':
+      return action.name;
     default:
       return state;
   }
 };
+// HOBBIES REDUCER
+var hobbiesReducer = (state = [], action) => {
+  switch (action.type) {
+    case 'ADD_HOBBY':
+      return [
+        ...state, // old items
+        { // new item
+          id: nextHobbyId++,
+          hobby: action.hobby
+        }
+      ]
+    case 'REMOVE_HOBBY':
+      return state.filter( (hobby) => hobby.id !== action.id);
+    default:
+      return state;
+  }
+};
+// MOVIES REDUCER
+var moviesReducer = (state = [], action) => {
+  switch (action.type) {
+    case 'ADD_MOVIE':
+      return [
+        ...state, // old items
+        { // new item
+          id: nextMovieId++,
+          movieName: action.movieName,
+          movieGenre: action.movieGenre
+        }
+      ]
+    case 'REMOVE_MOVIE':
+      return state.filter( (movie) => movie.id !== action.id);
+    default:
+      return state;
+  }
+};
+
+var reducer = redux.combineReducers({
+  // the name state will be managed by the name reducer
+  name: nameReducer,
+  hobbies: hobbiesReducer,
+  movies: moviesReducer
+});
 
 var store = redux.createStore(reducer, redux.compose(
   // make redux devtool work
