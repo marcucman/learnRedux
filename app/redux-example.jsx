@@ -13,7 +13,7 @@ console.log('Starting redux example');
 
 // ES6 way of assigning default values
 var reducer = (state = {name: 'Anonymous'}, action) => {
-  console.log('New action', action);
+  // console.log('New action', action);
 
   // HANDLE ACTION
   switch(action.type) {
@@ -27,7 +27,19 @@ var reducer = (state = {name: 'Anonymous'}, action) => {
   }
 };
 
-var store = redux.createStore(reducer);
+var store = redux.createStore(reducer, redux.compose(
+  // make redux devtool work
+  // if a devToolsExtension exists, use it. If not, pass the request through
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__() : f => f
+));
+
+// SUBSCRIBE TO CHANGES
+var unsubscribe = store.subscribe(() => { // this saves unsubscribe method
+  var state = store.getState();
+
+  console.log('Name is ', state.name);
+  document.getElementById('app').innerHTML = state.name;
+});
 
 var currentState = store.getState(); // return state object
 console.log('currentState', currentState);
@@ -35,11 +47,18 @@ console.log('currentState', currentState);
 // ACTION = object, must have 'type' property
 var action = {
   type: 'CHANGE_NAME', // action name
-  name: 'Brian' // value to pass
+  name: 'Andy' // value to pass
 };
 
 // DISPATCH ACTION
 store.dispatch(action);
 
+// UNSUBSCRIBE
+// unsubscribe();
+
+store.dispatch({
+  type: 'CHANGE_NAME',
+  name: 'Bambi'
+});
 // check that action changed the name
-console.log('Name should be Brian', store.getState());
+// console.log('Name should be Brian', store.getState());

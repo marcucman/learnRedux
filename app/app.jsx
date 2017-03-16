@@ -9,10 +9,10 @@ $(document).foundation(); // attach foundation to document
 // app css
 require('style!css!sass!applicationStyles');
 
-ReactDOM.render(
-  <p>Boilerplate</p>,
-  document.getElementById('app')
-);
+// ReactDOM.render(
+//   <p>Boilerplate</p>,
+//   document.getElementById('app')
+// );
 
-require('./redux-example.jsx');
-// require('./redux-todo-example.jsx');
+// require('./redux-example.jsx');
+require('./redux-todo-example.jsx');
