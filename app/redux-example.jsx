@@ -1,4 +1,5 @@
 var redux = require('redux');
+var axios = require('axios');
 
 console.log('Starting redux example');
 
@@ -161,12 +162,57 @@ var removeMovie = (id) => {
   }
 };
 
+// MAP REDUCER and ACTION GENERATORS
+// ***************************************
+var mapReducer = (state = {isFetching: false, url: undefined}, action) => {
+  switch (action.type) {
+    case 'START_LOCATION_FETCH':
+      return {
+        isFetching: true,
+        url: undefined // clear url if there was one
+      }
+    case 'COMPLETE_LOCATION_FETCH':
+      return {
+        isFetching: false,
+        url: action.url
+      }
+    default:
+      return state;
+  }
+};
+
+var startLocationFetch = () => {
+  return {
+    type: 'START_LOCATION_FETCH'
+  }
+};
+
+var completeLocationFetch = (url) => {
+  return {
+    type: 'COMPLETE_LOCATION_FETCH',
+    url
+  }
+};
+
+// requests data from 3rd party api
+var fetchLocation = () => {
+  store.dispatch(startLocationFetch()); // isFetching: true
+
+  axios.get('http://ipinfo.io').then(function(res) {
+    var loc = res.data.loc;
+    var baseUrl = 'http://maps.google.com?q=';
+
+    store.dispatch(completeLocationFetch(baseUrl + loc)); // isFetching: false
+  });
+};
+
 // COMBINE REDUCERS
 var reducer = redux.combineReducers({
   // the name state will be managed by the name reducer
   name: nameReducer,
   hobbies: hobbiesReducer,
-  movies: moviesReducer
+  movies: moviesReducer,
+  map: mapReducer
 });
 
 var store = redux.createStore(reducer, redux.compose(
@@ -179,10 +225,13 @@ var store = redux.createStore(reducer, redux.compose(
 var unsubscribe = store.subscribe(() => { // this saves unsubscribe method
   var state = store.getState();
 
-  console.log('Name is ', state.name);
-  document.getElementById('app').innerHTML = state.name;
-
   console.log('New state', store.getState());
+
+  if (state.map.isFetching) { // if retrieving
+    document.getElementById('app').innerHTML = 'loading...';
+  } else if (state.map.url) { // if data has arrived
+    document.getElementById('app').innerHTML = '<a href="' + state.map.url + '" target="_blank">View Your Location</a>';
+  }
 });
 
 var currentState = store.getState(); // return state object
@@ -217,6 +266,8 @@ store.dispatch({
 
 // UNSUBSCRIBE
 // unsubscribe();
+
+fetchLocation();
 
 // change name using action generator
 store.dispatch(changeName('Carly'));
